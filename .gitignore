@@ -1,3 +1,4 @@
 # 为大家避免不必要的提交
 lab*/obj
 lab*/bin
+.vscode

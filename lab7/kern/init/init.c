@@ -24,7 +24,7 @@ kern_init(void) {
     memset(edata, 0, end - edata);
     cons_init();                // init the console
 
-    const char *message = "(THU.CST) os is loading ...";
+    const char *message = "(NKU.CST) os is loading ...";
     cprintf("%s\n\n", message);
 
     print_kerninfo();
@@ -82,6 +82,7 @@ lab1_print_cur_status(void) {
 static void
 lab1_switch_to_user(void) {
     //LAB1 CHALLENGE 1 : TODO
+    
 }
 
 static void

@@ -25,7 +25,7 @@ kern_init(void) {
     memset(edata, 0, end - edata);
     cons_init();                // init the console
 
-    const char *message = "(THU.CST) os is loading ...";
+    const char *message = "(NKU.CST) os is loading ...";
     cprintf("%s\n\n", message);
 
     print_kerninfo();

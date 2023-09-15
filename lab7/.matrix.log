@@ -19,7 +19,7 @@ Runtime SBI Version    : 0.1
 
 PMP0: 0x0000000080000000-0x000000008001ffff (A)
 PMP1: 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
-(THU.CST) os is loading ...
+(NKU.CST) os is loading ...
 
 Special kernel symbols:
   entry  0xc0200036 (virtual)
