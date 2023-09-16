@@ -173,7 +173,7 @@ void exception_handler(struct trapframe *tf)
 
 	cprintf("Exception type:Illegal instruction\n");
 	cprintf("Illegal instruction caught at 0x%08x\n", tf->epc);
-    tf->epc=tf->epc+4;   //查到的资料：在异常处理程序中软件改变 mepc 指向下一条指令，由于现在 ecall/ebreak（或 c.ebreak）是 4（或 2）字节指令，因此改写设定 mepc=mepc+4（或+2）即可。
+    tf->epc=tf->epc+REGBYTES;   //查到的资料：在异常处理程序中软件改变 mepc 指向下一条指令，由于现在 ecall/ebreak（或 c.ebreak）是 4（或 2）字节指令，因此改写设定 mepc=mepc+4（或+2）即可。
 
         break;
     case CAUSE_BREAKPOINT:
