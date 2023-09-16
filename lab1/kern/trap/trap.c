@@ -45,10 +45,10 @@ void print_trapframe(struct trapframe *tf)
 {
     cprintf("trapframe at %p\n", tf);
     print_regs(&tf->gpr);
-    cprintf("  status   0x%08x\n", tf->status);
-    cprintf("  epc      0x%08x\n", tf->epc);
-    cprintf("  badvaddr 0x%08x\n", tf->badvaddr);
-    cprintf("  cause    0x%08x\n", tf->cause);
+    cprintf("  status   0x%08x\n", tf->status);   
+    cprintf("  epc      0x%08x\n", tf->epc);     //异常指令地址
+    cprintf("  badvaddr 0x%08x\n", tf->badvaddr);   //缺页异常地址; got说这是导致异常的虚拟地址
+    cprintf("  cause    0x%08x\n", tf->cause);   //原因
 }
 
 void print_regs(struct pushregs *gpr)
@@ -157,7 +157,7 @@ void interrupt_handler(struct trapframe *tf)
 
 void exception_handler(struct trapframe *tf)
 {
-    switch (tf->cause)
+    switch (tf->cause) //遍历cause，看是什么原因导致的异常
     {
     case CAUSE_MISALIGNED_FETCH:
         break;
@@ -165,11 +165,16 @@ void exception_handler(struct trapframe *tf)
         break;
     case CAUSE_ILLEGAL_INSTRUCTION:
         // 非法指令异常处理
-        /* LAB1 CHALLENGE3   YOUR CODE :  */
+        /* LAB1 CHALLENGE3   YOUR CODE :  2110939*/
         /*(1)输出指令异常类型（ Illegal instruction）
          *(2)输出异常指令地址
          *(3)更新 tf->epc寄存器
          */
+
+	cprintf("Exception type:Illegal instruction\n");
+	cprintf("Illegal instruction caught at 0x%08x\n", tf->epc);
+    tf->epc=tf->epc+REGBYTES;   //查到的资料：在异常处理程序中软件改变 mepc 指向下一条指令，由于现在 ecall/ebreak（或 c.ebreak）是 4（或 2）字节指令，因此改写设定 mepc=mepc+4（或+2）即可。
+
         break;
     case CAUSE_BREAKPOINT:
         // 断点异常处理
