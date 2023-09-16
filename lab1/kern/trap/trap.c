@@ -178,8 +178,8 @@ void exception_handler(struct trapframe *tf)
          *(2)输出异常指令地址
          *(3)更新 tf->epc寄存器
          */
-        cprintf("breakpoint interrupt\n");
-        cprintf("  epc      0x%08x\n", tf->epc);
+        cprintf("Exception type: breakpoint\n");
+        cprintf("ebreak caught at 0x%08x\n", tf->epc);
         tf->epc += REGBYTES;
         break;
     case CAUSE_MISALIGNED_LOAD:
