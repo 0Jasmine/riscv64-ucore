@@ -2,3 +2,5 @@
 lab*/obj
 lab*/bin
 .vscode
+.vs
+*/.vs
