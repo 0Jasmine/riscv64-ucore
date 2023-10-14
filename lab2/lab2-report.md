@@ -59,3 +59,24 @@ p->ref 应该为 0，因为现在 p 是空闲的并且没有引用。使用 p->p
     1. 时间复杂度高
     2. 容易造成外部碎片
   * 更深入地从 `如何减少移动` 思考， 其实或许是 `如何尽量高效地分配相邻空间` 的问题。
+
+不过， 这段代码真的没问题吗？
+
+```cpp
+        list_entry_t *le = &(free_area[high_order].free_list);
+        while ((le = list_next(le)) != &(free_area[high_order].free_list))
+        {
+            struct Page *page = le2page(le, page_link);
+
+            if (split_page < page)
+            {
+                list_add_before(le, &(split_page->page_link));
+                break;
+            }
+            else if (list_next(le) == &(free_area[high_order].free_list))
+            {
+                list_add(le, &(split_page->page_link));
+                // here
+            }
+        }
+```
