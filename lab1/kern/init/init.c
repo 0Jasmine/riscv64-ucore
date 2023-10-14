@@ -33,6 +33,13 @@ int kern_init(void) {
 
     intr_enable();  // enable irq interrupt
     
+    #ifdef DEBUG
+    asm volatile(
+        "csrwi mip,1"
+        "ebreak"
+    );
+    #endif
+
     while (1)
         ;
 }
