@@ -8,3 +8,7 @@
 |Jasmine Xie|[here](https://github.com/0Jasmine)|
 |Li Ying|[there](https://github.com/moonpie0)|
 |Xv Xin|[there](https://github.com/XX469)|
+
+
+- [lab1 report](./lab1/lab1.md)
+- [lab2 report](./lab2/lab2-report.md)
