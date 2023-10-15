@@ -9,8 +9,6 @@ unsigned nr_free = 0;
 
 #define IS_POWER_OF_2(x) (!((x) & ((x)-1)))
 
-static void
-__dump_list();
 
 static unsigned fixsize(unsigned size)
 {
@@ -216,7 +214,7 @@ buddy_system_alloc_pages(size_t n)
 {
     assert(n > 0);
     // 全局可分配空间小于时 return NULL
-    if(nr_free < n)
+    if (nr_free < n)
     {
         return NULL;
     }
@@ -453,8 +451,23 @@ basic_check(void)
     free_page(p0);
     free_page(p1);
     free_page(p2);
-    
+
     cprintf("now nr_free is: %d", nr_free);
+
+    nr_free += nr_free_store;
+    nr_free_store = nr_free;
+
+    assert((p0 = alloc_pages(45)) != NULL);
+    assert((p1 = alloc_pages(31)) != NULL);
+    assert((p2 = alloc_pages(125)) != NULL);
+
+    assert(nr_free == nr_free_store - 64 - 32 - 128);
+
+    free_pages(p0, 45);
+    free_pages(p1, 31);
+    free_pages(p2, 125);
+
+    assert(nr_free == nr_free_store);
 }
 
 static void

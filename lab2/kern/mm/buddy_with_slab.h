@@ -1,0 +1,10 @@
+#ifndef __KERN_MM_BUDDY_SLAB_PMM_H__
+#define  __KERN_MM_BUDDY_SLAB_PMM_H__
+
+#define MAX_ORDER 11
+
+#include <pmm.h>
+
+extern const struct pmm_manager buddy_with_slab_pmm_manager;
+
+#endif /* ! __KERN_MM_BUDDY_SYSTEM_PMM_H__ */

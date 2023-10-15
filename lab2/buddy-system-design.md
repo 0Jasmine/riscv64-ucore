@@ -1,6 +1,6 @@
 # buddy system 设计实现
 
-> 源码 [buddy_system_pmm.c](./kern/mm/buddy_system_pmm.c) ， 我可以当懒狗吗🤧， 源码了给了一些 `@brief` 的说明， 这里简单说一下实现思路。
+> 源码 [buddy_system_pmm.c](./kern/mm/buddy_system_pmm.c) ， 我可以当懒狗吗🤧， 写源码的时候给了很多 `@brief` 的说明（自认为真的很多）， 这里简单说一下实现思路。
 
 ## intro
 
@@ -41,7 +41,11 @@ free_area_t free_area[MAX_ORDER];
 
 即从不同 order 层取空闲块， 注意以下对其进行基于 `块` 粒度的分割、合并，以及基于 `页` 粒度的标志位修改即可。`"MAX_ORDER"` 的值默认为11，一次分配可以请求的 page frame 数目为1, 2, 4……最大为1024。
 
-### 对于 free_area 的位置
+> 如果要说很值得注意的地方， 就是把标志位， 比如说记得 PG_reserved, PG_property 置位、 清除什么的。
+
+### 初始化
+
+递归地（当然这里用 `while` 实现）， 根据最大的 order 层可以用到的内存数将 n 分割。
 
 ### 分配内存
 

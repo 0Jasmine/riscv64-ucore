@@ -1,6 +1,3 @@
-+ cc kern/mm/buddy_system_pmm.c
-+ ld bin/kernel
-riscv64-unknown-elf-objcopy bin/kernel --strip-all -O binary bin/ucore.img
 
 OpenSBI v0.4 (Jul  2 2019 11:53:53)
    ____                    _____ ____ _____
@@ -25,7 +22,7 @@ PMP1: 0x0000000000000000-0xffffffffffffffff (A,R,W,X)
 (NKU.CST) os is loading ...
 Special kernel symbols:
   entry  0xffffffffc0200036 (virtual)
-  etext  0xffffffffc0201acc (virtual)
+  etext  0xffffffffc0201be2 (virtual)
   edata  0xffffffffc0206010 (virtual)
   end    0xffffffffc0206560 (virtual)
 Kernel executable memory footprint: 26KB
@@ -82,7 +79,33 @@ order 7 : 1 ----- ffffffffc0345330 -->
 order 8 : 0 ----- 
 order 9 : 0 ----- 
 order 10 : 31 ----- ffffffffc020f330 --> ffffffffc0219330 --> ffffffffc0223330 --> ffffffffc022d330 --> ffffffffc0237330 --> ffffffffc0241330 --> ffffffffc024b330 --> ffffffffc0255330 --> ffffffffc025f330 --> ffffffffc0269330 --> ffffffffc0273330 --> ffffffffc027d330 --> ffffffffc0287330 --> ffffffffc0291330 --> ffffffffc029b330 --> ffffffffc02a5330 --> ffffffffc02af330 --> ffffffffc02b9330 --> ffffffffc02c3330 --> ffffffffc02cd330 --> ffffffffc02d7330 --> ffffffffc02e1330 --> ffffffffc02eb330 --> ffffffffc02f5330 --> ffffffffc02ff330 --> ffffffffc0309330 --> ffffffffc0313330 --> ffffffffc031d330 --> ffffffffc0327330 --> ffffffffc0331330 --> ffffffffc033b330 --> 
-now nr_free is: 3check_alloc_page() succeeded!
+now nr_free is: 3
+after expand : 6, 7  
+order 0 : 1 ----- ffffffffc0347018 --> 
+order 1 : 1 ----- ffffffffc0346ff0 --> 
+order 2 : 1 ----- ffffffffc0346f50 --> 
+order 3 : 1 ----- ffffffffc0346eb0 --> 
+order 4 : 1 ----- ffffffffc0346c30 --> 
+order 5 : 1 ----- ffffffffc0346730 --> 
+order 6 : 1 ----- ffffffffc0345d30 --> 
+order 7 : 0 ----- 
+order 8 : 0 ----- 
+order 9 : 0 ----- 
+order 10 : 31 ----- ffffffffc020f330 --> ffffffffc0219330 --> ffffffffc0223330 --> ffffffffc022d330 --> ffffffffc0237330 --> ffffffffc0241330 --> ffffffffc024b330 --> ffffffffc0255330 --> ffffffffc025f330 --> ffffffffc0269330 --> ffffffffc0273330 --> ffffffffc027d330 --> ffffffffc0287330 --> ffffffffc0291330 --> ffffffffc029b330 --> ffffffffc02a5330 --> ffffffffc02af330 --> ffffffffc02b9330 --> ffffffffc02c3330 --> ffffffffc02cd330 --> ffffffffc02d7330 --> ffffffffc02e1330 --> ffffffffc02eb330 --> ffffffffc02f5330 --> ffffffffc02ff330 --> ffffffffc0309330 --> ffffffffc0313330 --> ffffffffc031d330 --> ffffffffc0327330 --> ffffffffc0331330 --> ffffffffc033b330 --> 
+
+after expand : 7, 10  
+order 0 : 1 ----- ffffffffc0347018 --> 
+order 1 : 1 ----- ffffffffc0346ff0 --> 
+order 2 : 1 ----- ffffffffc0346f50 --> 
+order 3 : 1 ----- ffffffffc0346eb0 --> 
+order 4 : 1 ----- ffffffffc0346c30 --> 
+order 5 : 0 ----- 
+order 6 : 1 ----- ffffffffc0345d30 --> 
+order 7 : 1 ----- ffffffffc0210730 --> 
+order 8 : 1 ----- ffffffffc0211b30 --> 
+order 9 : 1 ----- ffffffffc0214330 --> 
+order 10 : 30 ----- ffffffffc0219330 --> ffffffffc0223330 --> ffffffffc022d330 --> ffffffffc0237330 --> ffffffffc0241330 --> ffffffffc024b330 --> ffffffffc0255330 --> ffffffffc025f330 --> ffffffffc0269330 --> ffffffffc0273330 --> ffffffffc027d330 --> ffffffffc0287330 --> ffffffffc0291330 --> ffffffffc029b330 --> ffffffffc02a5330 --> ffffffffc02af330 --> ffffffffc02b9330 --> ffffffffc02c3330 --> ffffffffc02cd330 --> ffffffffc02d7330 --> ffffffffc02e1330 --> ffffffffc02eb330 --> ffffffffc02f5330 --> ffffffffc02ff330 --> ffffffffc0309330 --> ffffffffc0313330 --> ffffffffc031d330 --> ffffffffc0327330 --> ffffffffc0331330 --> ffffffffc033b330 --> 
+check_alloc_page() succeeded!
 satp virtual address: 0xffffffffc0205000
 satp physical address: 0x0000000080205000
 ++ setup timer interrupts
@@ -95,6 +118,4 @@ satp physical address: 0x0000000080205000
 100 ticks
 100 ticks
 100 ticks
-100 ticks
-100 ticks
-qemu-system-riscv64: terminating on signal 15 from pid 162017 (make)
+qemu-system-riscv64: terminating on signal 15 from pid 204717 (make)
