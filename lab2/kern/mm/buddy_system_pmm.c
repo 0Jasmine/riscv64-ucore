@@ -4,11 +4,11 @@
 #include <buddy_system_pmm.h>
 #include <stdio.h>
 
+#define IS_POWER_OF_2(x) (!((x) & ((x)-1)))
+static void __dump_list();
+
 free_area_t free_area[MAX_ORDER];
 unsigned nr_free = 0;
-
-#define IS_POWER_OF_2(x) (!((x) & ((x)-1)))
-
 
 static unsigned fixsize(unsigned size)
 {
@@ -497,7 +497,6 @@ const struct pmm_manager buddy_system_pmm_manager = {
     .name = "buddy_system_pmm_manager",
     .init = buddy_system_init,
     .init_memmap = buddy_system_init_memmap,
-
     .alloc_pages = buddy_system_alloc_pages,
     .free_pages = buddy_system_free_pages,
     .nr_free_pages = buddy_system_nr_free_pages,

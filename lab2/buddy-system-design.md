@@ -64,3 +64,67 @@ free_area_t free_area[MAX_ORDER];
 
 1. 寻找相邻的块，看其是否释放了。
 2. 如果相邻块也释放了，合并这两个块，重复上述步骤直到遇上未释放的相邻块，或者达到最高上限（即所有内存都释放了）。
+
+## test
+
+设计测试样例：
+
+```cpp
+static void
+basic_check(void)
+{
+    struct Page *p0, *p1, *p2;
+    p0 = p1 = p2 = NULL;
+
+    assert((p0 = alloc_page()) != NULL);
+    assert((p1 = alloc_page()) != NULL);
+    assert((p2 = alloc_page()) != NULL);
+    __dump_list();
+    assert(p0 != p1 && p0 != p2 && p1 != p2);
+    assert(page_ref(p0) == 0 && page_ref(p1) == 0 && page_ref(p2) == 0);
+
+    assert(page2pa(p0) < npage * PGSIZE);
+    assert(page2pa(p1) < npage * PGSIZE);
+    assert(page2pa(p2) < npage * PGSIZE);
+
+    unsigned int nr_free_store = nr_free;
+    nr_free = 0;
+
+    assert(alloc_page() == NULL);
+
+    free_page(p0);
+    free_page(p1);
+    free_page(p2);
+
+    assert(nr_free == 3);
+
+    assert((p0 = alloc_page()) != NULL);
+    assert((p1 = alloc_page()) != NULL);
+    assert((p2 = alloc_page()) != NULL);
+
+    assert(alloc_page() == NULL);
+
+    free_page(p0);
+    free_page(p1);
+    free_page(p2);
+
+    cprintf("now nr_free is: %d", nr_free);
+
+    nr_free += nr_free_store;
+    nr_free_store = nr_free;
+
+    assert((p0 = alloc_pages(45)) != NULL);
+    assert((p1 = alloc_pages(31)) != NULL);
+    assert((p2 = alloc_pages(125)) != NULL);
+
+    assert(nr_free == nr_free_store - 64 - 32 - 128);
+
+    free_pages(p0, 45);
+    free_pages(p1, 31);
+    free_pages(p2, 125);
+
+    assert(nr_free == nr_free_store);
+}
+```
+
+因为测试结果比较长， 为了看得清晰我增加了一个 `__dump_list()` 用来打印设计的 buddy order，输出结果重定向在了[make test输出结果](./test.txt).

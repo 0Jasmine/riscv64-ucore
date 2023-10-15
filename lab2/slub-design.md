@@ -25,12 +25,23 @@
 ```cpp
 /// @brief 为每种范围大小的对象创建 cache
 typedef struct mem_cache {
-    uint8_t slab_order;    // 对应每个 slab 的 order
-    unsigned int num;         // 对应 slab 数量
-    list_entry_t cache_ref;    // 连接所有 cache 
+    unsigned int num;         // 对应 slab 总数量
+    mem_slab_list_t fullslab; // slab 管理链表， 表示已满
+    mem_slab_list_t usedslab; // slab 管理链表， 表示已用
+    mem_slab_list_t freeslab; // slab 管理链表， 表示全空
 } mem_cache_t;
 ```
 
 ## slab 设计
 
 充分利用现有接口, 定义 slab 如下
+
+```cpp
+/// @brief slab 定义
+typedef struct mem_slab {
+    struct Page* allocate_pages; // 对应分配的地址
+    unsigned int byte_free;      // 对应可用字节数
+    unsigned int num;      // 对应 object 数量
+    mem_object_t object_list;  
+} mem_slab_t;
+```
