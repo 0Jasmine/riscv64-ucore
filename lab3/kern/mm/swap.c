@@ -127,6 +127,7 @@ swap_in(struct mm_struct *mm, uintptr_t addr, struct Page **ptr_result)
      // cprintf("SWAP: load ptep %x swap entry %d to vaddr 0x%08x, page %x, No %d\n", ptep, (*ptep)>>8, addr, result, (result-pages));
     
      int r;
+     cprintf("ptep : %ld\n",(*ptep));
      if ((r = swapfs_read((*ptep), result)) != 0)
      {
         assert(r!=0);

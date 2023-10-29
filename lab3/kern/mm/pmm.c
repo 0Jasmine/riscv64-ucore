@@ -36,6 +36,7 @@ static void check_boot_pgdir(void);
 
 // init_pmm_manager - initialize a pmm_manager instance
 static void init_pmm_manager(void) {
+    // pmm_manager = &buddy_system_pmm_manager;
     pmm_manager = &default_pmm_manager;
     cprintf("memory management: %s\n", pmm_manager->name);
     pmm_manager->init();
@@ -400,12 +401,15 @@ static void check_pgdir(void) {
     nr_free_store=nr_free_pages();
 
     assert(npage <= KERNTOP / PGSIZE);
+    // boot_pgdir是页表的虚拟地址
     assert(boot_pgdir != NULL && (uint32_t)PGOFF(boot_pgdir) == 0);
     assert(get_page(boot_pgdir, 0x0, NULL) == NULL);
+    // get_page()尝试找到虚拟内存0x0对应的页，现在当然是没有的，返回NULL
 
     struct Page *p1, *p2;
     p1 = alloc_page();
     assert(page_insert(boot_pgdir, p1, 0x0, 0) == 0);
+    // 把这个物理页面通过多级页表映射到0x0
     pte_t *ptep;
     assert((ptep = get_pte(boot_pgdir, 0x0, 0)) != NULL);
     assert(pte2page(*ptep) == p1);
@@ -414,6 +418,7 @@ static void check_pgdir(void) {
     ptep = (pte_t *)KADDR(PDE_ADDR(boot_pgdir[0]));
     ptep = (pte_t *)KADDR(PDE_ADDR(ptep[0])) + 1;
     assert(get_pte(boot_pgdir, PGSIZE, 0) == ptep);
+     // get_pte查找某个虚拟地址对应的页表项，如果不存在这个页表项，会为它分配各级的页表
 
     p2 = alloc_page();
     assert(page_insert(boot_pgdir, p2, PGSIZE, PTE_U | PTE_W) == 0);
@@ -443,7 +448,7 @@ static void check_pgdir(void) {
     pde_t *pd1=boot_pgdir,*pd0=page2kva(pde2page(boot_pgdir[0]));
     free_page(pde2page(pd0[0]));
     free_page(pde2page(pd1[0]));
-    boot_pgdir[0] = 0;
+    boot_pgdir[0] = 0; //清除测试的痕迹
 
     assert(nr_free_store==nr_free_pages());
 
