@@ -163,5 +163,10 @@ get_pte() 函数（位于 kern/mm/pmm.c ）用于在页表中查找或创建页�
   - 访问效率（另一个角度会较低）。页表是以线性结构存储页表项，虚拟空间很大时，页表项数量随之增大，查找速度慢，查找对应的物理页框也就慢了。
   - TLB 缓存频繁缺失。TLB缓存有限，虚拟空间很大，导致一级页表较大，导致TLB无法缓存最近使用的所有页表项，导致命中概率降低，查询转换速率降低。
 
-## 扩展练习 Challenge：实现不考虑实现开销和效率的LRU页替换算法（需要编程）
+![make grade](./make-grade.png)
 
+## 扩展练习 Challenge：LRU页替换算法（需要编程）
+
+设计文件 [design-lru](./design-lru.md)
+头文件 [swap_lruk.h](./kern/mm/swap_lruk.h)
+源文件 [swap_lruk.h](./kern/mm/swap_lruk.c)

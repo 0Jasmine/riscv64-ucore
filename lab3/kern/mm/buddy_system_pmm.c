@@ -41,22 +41,23 @@ static uint8_t getlog2(unsigned number)
 static void expand(struct Page *page,
                    unsigned long low_order, unsigned long high_order)
 {
+    
     cprintf("\nafter expand : %d, %d  \n", low_order, high_order);
     free_area_t *area = &free_area[high_order];
     unsigned long size = (1U << high_order);
     while (high_order > low_order)
     {
-        area--;
         high_order--;
+        area = &free_area[high_order];
         size >>= 1;
         // 折半
         struct Page *split_page = &page[size];
-
+        cprintf("\n page = %lx, size = %ld, split = %lx\n", &page->page_link, size, &split_page->page_link);
         page->property = size;
 
         split_page->property = size;
         SetPageProperty(split_page);
-        split_page->flags = 0;
+        page->flags = 0;
 
         area->nr_free++;
 
@@ -277,7 +278,7 @@ buddy_system_free_pages(struct Page *base, size_t n)
     }
 
     SetPageProperty(base);
-    uint8_t order = getlog2(n);
+    uint8_t order = getlog2(n) - 1;
     nr_free += n;
 
     free_area_t *area = &(free_area[order]);
@@ -315,16 +316,16 @@ buddy_system_free_pages(struct Page *base, size_t n)
 
         list_entry_t *le = list_prev(&(base->page_link));
         order++;
-        if (le != free_list)
+if (le != free_list && le > &base->page_link)
         {
             p = le2page(le, page_link);
-            if (p + p->property == base)
+            if (p - p->property == base)
             {
-                p->property <<= 1;
-                ClearPageProperty(base);
+                base->property <<= 1;
+                p->property = 0;
+                ClearPageProperty(p);
                 list_del(&(base->page_link));
                 list_del(&(p->page_link));
-                base = p;
 
                 area->nr_free -= 2;
                 // 插入合并块, 此时free_list为下一层的 head
@@ -358,17 +359,18 @@ buddy_system_free_pages(struct Page *base, size_t n)
                 continue;
             }
         }
-
-        le = list_next(&(base->page_link));
-        if (le != free_list)
+        else if (le != free_list && le < &base->page_link)
         {
             p = le2page(le, page_link);
             if (p + p->property == base)
             {
-                base->property <<= 1;
-                ClearPageProperty(p);
+                
+                p->property <<= 1;
+                base->property = 0;
+                ClearPageProperty(base);
                 list_del(&(base->page_link));
                 list_del(&(p->page_link));
+                base = p;
 
                 area->nr_free -= 2;
                 // 插入合并块, 此时free_list为下一层的 head
@@ -419,11 +421,10 @@ basic_check(void)
 {
     struct Page *p0, *p1, *p2;
     p0 = p1 = p2 = NULL;
-
     assert((p0 = alloc_page()) != NULL);
     assert((p1 = alloc_page()) != NULL);
     assert((p2 = alloc_page()) != NULL);
-    __dump_list();
+    
     assert(p0 != p1 && p0 != p2 && p1 != p2);
     assert(page_ref(p0) == 0 && page_ref(p1) == 0 && page_ref(p2) == 0);
 
@@ -435,22 +436,20 @@ basic_check(void)
     nr_free = 0;
 
     assert(alloc_page() == NULL);
-
     free_page(p0);
     free_page(p1);
     free_page(p2);
-
+    __dump_list();
     assert(nr_free == 3);
-
     assert((p0 = alloc_page()) != NULL);
     assert((p1 = alloc_page()) != NULL);
     assert((p2 = alloc_page()) != NULL);
 
     assert(alloc_page() == NULL);
 
-    free_page(p0);
-    free_page(p1);
     free_page(p2);
+    free_page(p1);
+    free_page(p0);
 
     cprintf("now nr_free is: %d", nr_free);
 
