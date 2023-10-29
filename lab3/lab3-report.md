@@ -1,6 +1,6 @@
 # lab3 report
 
-## exercise 1 ：理解基于FIFO的页面替换算法（思考题）
+## exercise 1 ：理解基于 FIFO 的页面替换算法（思考题）
 
 1. **int do_pgfault (struct mm_struct \*mm, uint_t error_code, uintptr_t addr)**
   
@@ -132,6 +132,18 @@ get_pte() 函数（位于 kern/mm/pmm.c ）用于在页表中查找或创建页�
       G (Global) 位：表示在 CR3 寄存器更新时无需刷新 TLB 中关于该页的地址。
       9-11 位保留给 OS 使用。
       12-31 位指明物理页基址。
+
+      ```C
+      struct Page {
+         int ref;                        // page frame's reference counter
+         uint_t flags;                 // array of flags that describe the status of the page frame
+         uint_t visited;
+         unsigned int property;          // the num of free block, used in first fit pm manager
+         list_entry_t page_link;         // free list link
+         list_entry_t pra_page_link;     // used for pra (page replace algorithm)
+         uintptr_t pra_vaddr;            // used for pra (page replace algorithm)
+      };
+      ```
 
 2. CPU 会把产生异常的线性地址存储在 `CR2` 寄存器中，并且把表示页访问异常类型的 `error Code` 保存在中断栈中，以便恢复现场。然后就是和普通的中断一样，保护现场，将寄存器的值压入栈中，设置错误代码 error_code，触发 Page Fault 异常，然后压入 error_code 中断服务例程，将外存的数据换到内存中来，最后退出中断，回到进入中断前的状态。
 
