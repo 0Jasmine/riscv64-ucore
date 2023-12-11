@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <unistd.h>
 
+// NOTICE
 /* ------------- process/thread mechanism design&implementation -------------
 (an simplified Linux process/thread mechanism )
 introduction:
@@ -87,7 +88,7 @@ static struct proc_struct *
 alloc_proc(void) {
     struct proc_struct *proc = kmalloc(sizeof(struct proc_struct));
     if (proc != NULL) {
-    //LAB4:EXERCISE1 YOUR CODE
+    //LAB4:EXERCISE1 2113302
     /*
      * below fields in proc_struct need to be initialized
      *       enum proc_state state;                      // Process state
@@ -104,12 +105,26 @@ alloc_proc(void) {
      *       char name[PROC_NAME_LEN + 1];               // Process name
      */
 
-     //LAB5 YOUR CODE : (update LAB4 steps)
+     //LAB5 2113302 : (update LAB4 steps)
      /*
      * below fields(add in LAB5) in proc_struct need to be initialized  
      *       uint32_t wait_state;                        // waiting state
      *       struct proc_struct *cptr, *yptr, *optr;     // relations between processes
      */
+        proc->state = PROC_UNINIT;
+        proc->pid = -1;
+        proc->runs = 0;
+        proc->kstack = 0;
+        proc->need_resched = 0;
+        proc->parent = NULL;
+        proc->mm = NULL;
+        memset(&(proc->context), 0, sizeof(struct context));
+        proc->tf = NULL;
+        proc->cr3 = boot_cr3;
+        proc->flags = 0;
+        proc->wait_state = 0;
+        proc->cptr = proc->yptr = proc->optr = NULL;
+        memset(proc->name, 0, PROC_NAME_LEN);
     }
     return proc;
 }
@@ -197,7 +212,7 @@ get_pid(void) {
 void
 proc_run(struct proc_struct *proc) {
     if (proc != current) {
-        // LAB4:EXERCISE3 YOUR CODE
+        // LAB4:EXERCISE3 2113302
         /*
         * Some Useful MACROs, Functions and DEFINEs, you can use them in below implementation.
         * MACROs or Functions:
@@ -206,7 +221,16 @@ proc_run(struct proc_struct *proc) {
         *   lcr3():                   Modify the value of CR3 register
         *   switch_to():              Context switching between two processes
         */
+        bool flag;
+        local_intr_save(flag);
 
+        struct proc_struct * prev = current;
+        current = proc;
+
+        lcr3(proc->cr3);
+        switch_to(&(prev->context),&(current->context));
+        
+        local_intr_restore(flag);
     }
 }
 
@@ -369,7 +393,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
         goto fork_out;
     }
     ret = -E_NO_MEM;
-    //LAB4:EXERCISE2 YOUR CODE
+    //LAB4:EXERCISE2 2113302
     /*
      * Some Useful MACROs, Functions and DEFINEs, you can use them in below implementation.
      * MACROs or Functions:
@@ -395,7 +419,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     //    6. call wakeup_proc to make the new child process RUNNABLE
     //    7. set ret vaule using child proc's pid
 
-    //LAB5 YOUR CODE : (update LAB4 steps)
+    //LAB5 2113302 : (update LAB4 steps)
     //TIPS: you should modify your written code in lab4(step1 and step5), not add more code.
    /* Some Functions
     *    set_links:  set the relation links of process.  ALSO SEE: remove_links:  lean the relation links of process 
@@ -403,7 +427,27 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     *    update step 1: set child proc's parent to current process, make sure current process's wait_state is 0
     *    update step 5: insert proc_struct into hash_list && proc_list, set the relation links of process
     */
- 
+    proc = alloc_proc();
+    if(proc == NULL) goto fork_out;
+    // 设置新创建进程的父进程
+    proc->parent = current;
+    current->wait_state = 0;
+    if(setup_kstack(proc) == -E_NO_MEM) {
+        goto bad_fork_cleanup_proc;
+    }
+    if(copy_mm(clone_flags,proc)!= 0)
+    {
+        goto bad_fork_cleanup_kstack;
+    }
+    copy_thread(proc, stack, tf);
+    
+    proc->pid=get_pid();
+    hash_proc(proc);
+    set_links(proc);
+
+    wakeup_proc(proc);
+    return proc->pid;
+
 fork_out:
     return ret;
 
@@ -595,7 +639,7 @@ load_icode(unsigned char *binary, size_t size) {
     // Keep sstatus
     uintptr_t sstatus = tf->status;
     memset(tf, 0, sizeof(struct trapframe));
-    /* LAB5:EXERCISE1 YOUR CODE
+    /* LAB5:EXERCISE1 2113302
      * should set tf->gpr.sp, tf->epc, tf->status
      * NOTICE: If we set trapframe correctly, then the user level process can return to USER MODE from kernel. So
      *          tf->gpr.sp should be user stack top (the value of sp)
@@ -603,8 +647,10 @@ load_icode(unsigned char *binary, size_t size) {
      *          tf->status should be appropriate for user program (the value of sstatus)
      *          hint: check meaning of SPP, SPIE in SSTATUS, use them by SSTATUS_SPP, SSTATUS_SPIE(defined in risv.h)
      */
-
-
+    tf->gpr.sp = USTACKTOP;
+    tf->epc = elf->e_entry;
+    tf->status = sstatus & ~(SSTATUS_SPP | SSTATUS_SPIE) | SSTATUS_UIE;
+    
     ret = 0;
 out:
     return ret;
@@ -622,6 +668,7 @@ bad_mm:
 //           - call load_icode to setup new memory space accroding binary prog.
 int
 do_execve(const char *name, size_t len, unsigned char *binary, size_t size) {
+    // 为加载新的执行码做好用户态内存空间清空准备。
     struct mm_struct *mm = current->mm;
     if (!user_mem_check(mm, (uintptr_t)name, len, 0)) {
         return -E_INVAL;
@@ -633,18 +680,24 @@ do_execve(const char *name, size_t len, unsigned char *binary, size_t size) {
     char local_name[PROC_NAME_LEN + 1];
     memset(local_name, 0, sizeof(local_name));
     memcpy(local_name, name, len);
-
+    // 果mm不为NULL，则设置页表为内核空间页表
     if (mm != NULL) {
         cputs("mm != NULL");
         lcr3(boot_cr3);
+        // 进一步判断mm的引用计数减1后是否为0，
+        // 如果为0，则表明没有进程再需要此进程所占用的内存空间
+        // 为此将根据mm中的记录，
+        // 释放进程所占用户空间内存和进程页表本身所占空间
         if (mm_count_dec(mm) == 0) {
             exit_mmap(mm);
             put_pgdir(mm);
             mm_destroy(mm);
         }
+        // 把当前进程的mm内存管理指针为空。
         current->mm = NULL;
     }
     int ret;
+    // 加载应用程序执行码到当前进程的新创建的用户态虚拟空间中
     if ((ret = load_icode(binary, size)) != 0) {
         goto execve_exit;
     }
