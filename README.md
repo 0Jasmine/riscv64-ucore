@@ -12,3 +12,7 @@
 
 - [lab1 report](./lab1/lab1.md)
 - [lab2 report](./lab2/lab2-report.md)
+- [lab3 report](./lab3/lab3-report.md)
+- [lab4 report](./lab4/lab4-report.md)
+- [lab5 report](./lab5/lab5.md)
+
