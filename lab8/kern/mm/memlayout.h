@@ -51,7 +51,7 @@
 
 #define KERNEL_BEGIN_PADDR 0x80200000
 #define KERNEL_BEGIN_VADDR 0xFFFFFFFFC0200000
-#define PHYSICAL_MEMORY_END 0x88000000
+#define PHYSICAL_MEMORY_END 0x8800000
 /* *
  * Virtual page table. Entry PDX[VPT] in the PD (Page Directory) contains
  * a pointer to the page directory itself, thereby turning the PD into a page
@@ -90,7 +90,7 @@ typedef pte_t swap_entry_t; //the pte can also be a swap entry
 /* *
  * struct Page - Page descriptor structures. Each Page describes one
  * physical page. In kern/mm/pmm.h, you can find lots of useful functions
- * that convert Page to other data types, such as physical address.
+ * that convert Page to other data types, such as phyical address.
  * */
 struct Page {
     int ref;                        // page frame's reference counter

@@ -25,7 +25,7 @@ kern_init(void) {
     memset(edata, 0, end - edata);
     cons_init();                // init the console
 
-    const char *message = "(NKU.CST) os is loading ...";
+    const char *message = "(THU.CST) os is loading ...";
     cprintf("%s\n\n", message);
 
     print_kerninfo();
@@ -48,6 +48,9 @@ kern_init(void) {
     clock_init();               // init clock interrupt
     intr_enable();              // enable irq interrupt
 
+    //LAB1: CAHLLENGE 1 If you try to do it, uncomment lab1_switch_test()
+    // user/kernel mode switch test
+    //lab1_switch_test();
     cpu_idle();                 // run idle process
 }
 
@@ -77,5 +80,24 @@ lab1_print_cur_status(void) {
     round ++;
 }
 
+static void
+lab1_switch_to_user(void) {
+    //LAB1 CHALLENGE 1 : TODO
+}
 
+static void
+lab1_switch_to_kernel(void) {
+    //LAB1 CHALLENGE 1 :  TODO
+}
+
+static void
+lab1_switch_test(void) {
+    lab1_print_cur_status();
+    cprintf("+++ switch to  user  mode +++\n");
+    lab1_switch_to_user();
+    lab1_print_cur_status();
+    cprintf("+++ switch to kernel mode +++\n");
+    lab1_switch_to_kernel();
+    lab1_print_cur_status();
+}
 

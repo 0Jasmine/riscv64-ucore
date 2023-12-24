@@ -147,6 +147,7 @@ sfs_init_freemap(struct device *dev, struct bitmap *freemap, uint32_t blkno, uin
  */
 static int
 sfs_do_mount(struct device *dev, struct fs **fs_store) {
+    // 以 block 为单位，大小需要大于基本的数据结构
     static_assert(SFS_BLKSIZE >= sizeof(struct sfs_super));
     static_assert(SFS_BLKSIZE >= sizeof(struct sfs_disk_inode));
     static_assert(SFS_BLKSIZE >= sizeof(struct sfs_disk_entry));

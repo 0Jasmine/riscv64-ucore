@@ -246,3 +246,96 @@ inode_open_count(struct inode *node) {
 
 #endif /* !__KERN_FS_VFS_INODE_H__ */
 
+/*
+  * 对 inode 的抽象操作。
+  *
+  * 这些以VOP_FOO(inode, args)的形式使用，它们是宏
+  * 扩展为 inode->inode_ops->vop_foo(inode, args)。 行动
+  *“foo”是：
+  *
+  * vop_open - 在文件的 open() 上调用。 可以用来
+  * 拒绝非法或不需要的打开方式。 注意
+  * 无需操作即可执行各种操作
+  * 文件实际被打开。
+  * inode 不需要查看 O_CREAT、O_EXCL 或
+  * O_TRUNC，因为这些是在 VFS 层处理的。
+  *
+  * VOP_EACHOPEN 不应直接调用
+  * VFS 层之上 - 使用 vfs_open() 打开 inode。
+  * 这会维护打开计数，以便 VOP_LASTCLOSE 可以
+  * 在正确的时间被呼叫。
+  *
+  * vop_close - 在文件的 *last* close() 上调用。
+  *
+  * VOP_LASTCLOSE 不应直接调用
+  * VFS层之上——使用vfs_close()关闭
+  * 使用 vfs_open() 打开的 inode。
+  *
+  * vop_reclaim - 当 inode 不再使用时调用。 注意
+  * 这可能是在 vop_lastclose 之后
+  * 被调用。
+  *
+  **********************************************
+  *
+  * vop_read - 在指定的偏移处从文件读取数据到 uio
+  * 在 uio 中，更新 uio_resid 以反映
+  * 读取量，并更新 uio_offset 以匹配。
+  * 不允许在目录或符号链接上使用。
+  *
+  * vop_getdirentry - 将单个文件名从目录读取到
+  * uio，根据偏移量选择什么名称
+  * uio 中的字段，并更新该字段。
+  * 与常规文件上的 I/O 不同，该值
+  * 偏移字段不被外部解释
+  * 文件系统，因此不需要是一个字节
+  *                      数数。 但是， uio_resid 字段应该是
+  * 以正常方式处理。
+  * 对于非目录对象，返回 ENOTDIR。
+  *
+  * vop_write - 将数据从 uio 写入指定偏移量的文件
+  * 在 uio 中，更新 uio_resid 以反映
+  * 写入量，并更新 uio_offset 以匹配。
+  * 不允许在目录或符号链接上使用。
+  *
+  * vop_ioctl - 使用数据对文件执行 ioctl 操作 OP
+  *                      数据。 数据的解释是具体的
+  * 每个 ioctl。
+  *
+  * vop_fstat - 返回有关文件的信息。 指针是一个
+  * 指向结构体stat的指针； 参见 stat.h。
+  *
+  * vop_gettype - 返回文件类型。 文件类型的值
+  * 位于 sfs.h 中。
+  *
+  * vop_tryseek - 检查是否寻找到指定位置
+  * 该文件是合法的。 （例如，所有寻求
+  * 在串口设备上是非法的，并且寻求
+  * 大小固定的文件上过去的 EOF 可能是
+  * 也是如此。）
+  *
+  * vop_fsync - 强制与该文件关联的任何脏缓冲区
+  * 稳定储存。
+  *
+  * vop_truncate - 强制将文件大小设置为传递的长度
+  * 中，丢弃任何多余的块。
+  *
+  * vop_namefile - 计算相对于文件系统根的路径名
+  * 文件并复制到指定的io缓冲区。
+  * 不需要对不适合的对象进行操作
+  * 目录。
+  *
+  **********************************************
+  *
+  * vop_creat - 在传递的文件中创建一个名为 NAME 的常规文件
+  * 目录 DIR. 如果布尔 EXCL 为 true，则失败
+  * 文件已经存在； 否则，请使用
+  * 现有文件（如果有）。 把手还给
+  * 根据 vop_lookup 的文件 inode。
+  *
+  **********************************************
+  *
+  * vop_lookup - 解析相对于传递目录的 PATHNAME
+  * DIR，并交回文件的索引节点
+  * 指的是。 可能会破坏 PATHNAME。 应该增加
+  * 交回的索引节点的引用计数。
+  */

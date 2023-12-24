@@ -18,10 +18,14 @@ static __noinline void __up(semaphore_t *sem, uint32_t wait_state) {
     local_intr_save(intr_flag);
     {
         wait_t *wait;
+        // 等待队列为空
         if ((wait = wait_queue_first(&(sem->wait_queue))) == NULL) {
             sem->value ++;
         }
+        // 等待队列不空
         else {
+            // 调用wakeup_wait函数来唤醒等待队列中的一个或多个等待项。
+            // 这意味着资源现在可用，并且至少有一个进程可以继续执行。
             assert(wait->proc->wait_state == wait_state);
             wakeup_wait(&(sem->wait_queue), wait, wait_state, 1);
         }

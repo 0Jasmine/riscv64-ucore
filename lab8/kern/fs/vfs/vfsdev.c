@@ -12,6 +12,14 @@
 #include <assert.h>
 #include <proc.h>
 // device info entry in vdev_list 
+/**
+ * 利用 vfs_dev_t 数据结构
+ * 可以让文件系统通过一个链接 vfs_dev_t 结构
+ * 的双向链表找到 device 对应的 inode 数据结构，
+ * 一个 inode 节点的成员变量 in_type 的值是 0x1234，
+ * 则此 inode 的成员变量 in_info 将成为一个 device 结构。
+ * 这样 inode 就和一个设备建立了联系，这个 inode 就是一个设备文件。
+*/
 typedef struct {
     const char *devname;
     struct inode *devnode;

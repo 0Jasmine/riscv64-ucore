@@ -159,6 +159,7 @@ dev_init(void) {
 struct inode *
 dev_create_inode(void) {
     struct inode *node;
+    // #define alloc_inode(type) __alloc_inode(__in_type(type))
     if ((node = alloc_inode(device)) != NULL) {
         vop_init(node, &dev_node_ops, NULL);
     }

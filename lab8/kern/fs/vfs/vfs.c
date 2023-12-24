@@ -25,7 +25,9 @@ __alloc_fs(int type) {
 // vfs_init -  vfs initialize
 void
 vfs_init(void) {
+    // 初始化文件系统的信号量以及等待队列
     sem_init(&bootfs_sem, 1);
+    // 初始化设备队列以及设备的等待队列
     vfs_devlist_init();
 }
 

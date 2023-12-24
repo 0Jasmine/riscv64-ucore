@@ -62,7 +62,6 @@
 #define PGSHIFT         12                      // log2(PGSIZE)
 #define PTSIZE          (PGSIZE * NPTEENTRY)    // bytes mapped by a page directory entry
 #define PTSHIFT         21                      // log2(PTSIZE)
-#define PDSIZE          (PTSIZE * NPDEENTRY)    // bytes mapped by a page directory
 
 #define PTXSHIFT        12                      // offset of PTX in a linear address
 #define PDX0SHIFT       21                      // offset of PDX in a linear address
