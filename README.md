@@ -15,4 +15,5 @@
 - [lab3 report](./lab3/lab3-report.md)
 - [lab4 report](./lab4/lab4-report.md)
 - [lab5 report](./lab5/lab5.md)
+- [lab8 report](./lab8/lab8-report.md)
 
